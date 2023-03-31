@@ -3,28 +3,25 @@ import pygame
 import time
 import random
 from jogo import Cascavel
-from controlador import Controle
-from brain import Brain
 
 import random as rd
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import differential_evolution
 
-snake_speed = 500
+snake_speed = 120 
 
 directions = ['RIGHT', 'UP', 'LEFT']
-# obstaculos = [[10, 10], [50, 50], [50, 60], [50, 70], [50, 80]]
-obstaculos = []
+obstaculos = [[10, 10], [50, 50], [50, 60], [50, 70], [50, 80]]
+
 # Window size
-window_x = 1000
-window_y = 1000
+window_x = 720
+window_y = 480
 # window_x = 1000
 # window_y = 1000
 # pixels por ponto
 # variável que auxilia no desenho das cobras, organização do tabuleiro, limites e obstaculos
-ppp = 40
-n_cobrinhas = 50
+ppp = 10
+n_cobrinhas = 40
 
 # defining colors
 black = pygame.Color(0, 0, 0)
@@ -44,13 +41,12 @@ fps = pygame.time.Clock()
  
 # Main Function
 cobrinhas = []
-# for i in range(0, n_cobrinhas):
-#     controlador = Controle(Cascavel([window_x, window_y], pygame, game_window, ppp, obstaculos), Brain())
-#     cobrinhas.append(controlador)
+for i in range(0, n_cobrinhas):
+    cobrinhas.append(Cascavel([window_x, window_y], pygame, game_window, ppp, obstaculos))
 
 pygame.display.update()
 
-def drawAll(cobra = None):
+def drawAll():
     game_window.fill(black)
     # Desenhando as margens do mapa
     pygame.draw.rect(game_window, green, pygame.Rect(0, 0, window_x, ppp))
@@ -61,8 +57,6 @@ def drawAll(cobra = None):
     for obs in obstaculos:
         pygame.draw.rect(game_window, white, pygame.Rect(obs[0], obs[1], ppp, ppp))
 
-    if cobra:
-        cobra.draw()
     for cobra in cobrinhas:
         cobra.draw()
     fps.tick(snake_speed)
@@ -76,35 +70,19 @@ def run():
             a = 37
             # print(event)
         for cobra in cobrinhas:
-            cobra.move()
-            mortas += cobra.is_dead() if 1 else 0
-        
+            moves = cobra.possible_moves()
+            # print(moves)
+            if len(moves) != 0:
+                dir = moves[random.randint(0, len(moves) - 1)]
+                cobra.move(dir)
+            mortas += cobra.isGameOver() if 1 else 0
+        drawAll()
         if mortas == len(cobrinhas):
             for cobra in cobrinhas:
-                print(cobra.get_score())
-            break
+                print(cobra.getScore())
 
-def fun(x, *data):
-    h = x[:5*6].reshape((5, 6))
-    w = x[5*6:].reshape((6, 3))
-    window_x = data[0]
-    window_y = data[1]
-    pygame = data[2]
-    game_window = data[3]
-    controlador = Controle(Cascavel([window_x, window_y], pygame, game_window, 40, []), Brain(h=h, w=w))
-    while True:
-        pygame.event.get()
-        drawAll(controlador)
-        controlador.move()
-        if controlador.is_dead():
-            return -controlador.get_score()
 
-# run()
-args = [window_x, window_y, pygame, game_window, obstaculos]
-result = differential_evolution(fun, [(-1, 1) for n in range(5*6+6*3)], args=args, maxiter=5, disp=True)
 
-print(result)
-print(result.x)
 time.sleep(2)
 pygame.quit()
 quit()

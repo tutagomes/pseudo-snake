@@ -1,26 +1,24 @@
 import numpy as np
 
-xsize = 4
-hsize = 6
-wsize = 3
+class Brain:
+    def __init__(self, xsize = 5, hsize = 6, wsize = 3, h=None, w=None):
+        self.xsize = xsize
+        self.hsize = hsize
+        self.wsize = wsize
 
-h = np.random.rand(xsize, hsize)
-w = np.random.rand(hsize, wsize)
+        self.h = h
+        self.w = w
 
-print(h)
-print(w)
+        if h is None:
+            self.h = np.random.uniform(-1, 1, size=(xsize, hsize))
 
-def move(x):
-    x = np.matrix(x)
+        if w is None:
+            self.w = np.random.uniform(-1, 1, size=(hsize, wsize))
 
-    hs = np.matmul(x, h)
-    ys = np.matmul(hs, w)
-    
-    y = np.zeros(wsize)
-    y[np.argmax(ys)] = 1
+    def get_move(self, input):
+        x = np.matrix(input)
 
-    return y
-
-x = [1, 1, 1, 0.5]
-
-print(move(x))
+        hs = np.matmul(x, self.h)
+        ys = np.matmul(hs, self.w)
+        
+        return np.argmax(ys)

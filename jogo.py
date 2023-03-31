@@ -1,14 +1,13 @@
 
-import time
 import random
+import numpy as np
 
 class Cascavel:
 
     # Onde ppp é uma variável de controle (pixels por ponto) que determina uma melhor conversão entre o que é mostrado na tela e o que é o jogo real
     # Por exemplo, para calcular o x_max, tem-se a largura total da tela menos o ppp para impedir que a cobrinha já comece na beirada do tabuleiro
 
-    def __init__(self, tabuleiro, pygame, game_window, ppp, obstaculos = []):
-        
+    def __init__(self, tabuleiro, pygame, game_window, ppp, obstaculos):
         self.pygame = pygame
         self.game_window = game_window
         self.obstaculos = obstaculos
@@ -20,7 +19,8 @@ class Cascavel:
         self.snake_body = [[self.snake_position[0], self.snake_position[1]],
                 [self.snake_position[0] + ppp, self.snake_position[1]],
                 [self.snake_position[0] + 2*ppp, self.snake_position[1]],
-                [self.snake_position[0] + 3*ppp, self.snake_position[1]]
+                [self.snake_position[0] + 3*ppp, self.snake_position[1]],
+                [self.snake_position[0] + 4*ppp, self.snake_position[1]]
             ]
 
         # fruit position
@@ -39,6 +39,7 @@ class Cascavel:
         self.cobra = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
         # self.fruta = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
         self.fruta = self.cobra
+        self.moves = 0
     # displaying Score function
 
     def get_direction(self):
@@ -51,7 +52,7 @@ class Cascavel:
         elif self.snake_body[0][0] < self.snake_body[1][0] and self.snake_body[0][1] == self.snake_body[1][1]: # Estou indo pra esquerda
             return 'LEFT'
 
-    def possible_moves(self):
+    def get_possible_moves(self):
         possible_moves = []
         scale = 10
         def is_valid_position(position):
@@ -59,31 +60,44 @@ class Cascavel:
                 return True
             return False
 
+        new_position = self.get_next_position("LEFT")
+        if is_valid_position(new_position):
+            possible_moves.append(1)
+        else:
+            possible_moves.append(0)
+        
         new_position = self.get_next_position("UP")
         if is_valid_position(new_position):
-            possible_moves.append("UP")
+            possible_moves.append(1)
+        else:
+            possible_moves.append(0)
 
         new_position = self.get_next_position("RIGHT")
         if is_valid_position(new_position):
-            possible_moves.append("RIGHT")
+            possible_moves.append(1)
+        else:
+            possible_moves.append(0)
 
-        new_position = self.get_next_position("LEFT")
-        if is_valid_position(new_position):
-            possible_moves.append("LEFT")
-        if len(possible_moves) == 0:
+        if np.sum(possible_moves) == 0:
             self.game_over()
+
         return possible_moves
 
-    def getScore(self):
+    def get_score(self):
         return self.score
     
-    def isGameOver(self):
+    def is_game_over(self):
         return self.gameOver
 
     def game_over(self):
         self.gameOver = True
         self.cobra = self.pygame.Color(255, 0, 0)
         self.fruta = self.pygame.Color(255, 0, 0)
+
+    def get_rel_food_position(self):
+        onDown = 1 if (self.snake_position[1] - self.fruit_position[1]) < 0 else 0
+        onRight = 1 if (self.snake_position[0] - self.fruit_position[0]) < 0 else 0
+        return [(self.snake_position[0] - self.fruit_position[0]), (self.snake_position[1] - self.fruit_position[1])]
 
     def draw(self):
         for pos in self.snake_body:
@@ -130,6 +144,7 @@ class Cascavel:
     def move(self, direction):
         if self.gameOver:
             return
+
         # Moving the snake
         position = self.get_next_position(direction)
         self.snake_position[0] = position[0]
@@ -138,9 +153,13 @@ class Cascavel:
         # Snake body growing mechanism
         # if fruits and snakes collide then scores
         # will be incremented by 10
+        if self.moves < 4:
+            self.moves = self.moves + 1
+        self.score += 0.5
         self.snake_body.insert(0, list(self.snake_position))
         if self.snake_position[0] == self.fruit_position[0] and self.snake_position[1] == self.fruit_position[1]:
-            self.score += 10
+            self.score += 1000/self.moves
+            self.moves = 0
             self.fruit_spawn = False
         else:
             self.snake_body.pop()
@@ -163,4 +182,9 @@ class Cascavel:
         #         self.game_over()
         if (self.snake_position in self.obstaculos) or (self.snake_position in self.snake_body[1:]):
             self.game_over()
+
+    def smart_move(self):
+        move = self.brain.get_move(self)
+        self.move(move)
+
     
