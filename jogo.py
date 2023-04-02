@@ -7,9 +7,7 @@ class Cascavel:
     # Onde ppp é uma variável de controle (pixels por ponto) que determina uma melhor conversão entre o que é mostrado na tela e o que é o jogo real
     # Por exemplo, para calcular o x_max, tem-se a largura total da tela menos o ppp para impedir que a cobrinha já comece na beirada do tabuleiro
 
-    def __init__(self, tabuleiro, pygame, game_window, ppp, obstaculos):
-        self.pygame = pygame
-        self.game_window = game_window
+    def __init__(self, tabuleiro, ppp, obstaculos):
         self.obstaculos = obstaculos
         self.ppp = ppp
         # defining snake default position
@@ -36,10 +34,8 @@ class Cascavel:
     
         # initial score
         self.score = 0
-        self.cobra = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
-        # self.fruta = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
-        self.fruta = self.cobra
         self.moves = 0
+        self.frutas = 0
     # displaying Score function
 
     def get_direction(self):
@@ -56,7 +52,7 @@ class Cascavel:
         possible_moves = []
         scale = 10
         def is_valid_position(position):
-            if (scale < position[0] < (self.tabuleiro[0]) - scale) and (scale < position[1] < (self.tabuleiro[1]) - scale ) and (position not in self.snake_body) and (position not in self.obstaculos):
+            if (scale <= position[0] < (self.tabuleiro[0]) - scale) and (scale <= position[1] < (self.tabuleiro[1]) - scale ) and (position not in self.snake_body) and (position not in self.obstaculos):
                 return True
             return False
 
@@ -91,19 +87,25 @@ class Cascavel:
 
     def game_over(self):
         self.gameOver = True
-        self.cobra = self.pygame.Color(255, 0, 0)
-        self.fruta = self.pygame.Color(255, 0, 0)
 
     def get_rel_food_position(self):
         onDown = 1 if (self.snake_position[1] - self.fruit_position[1]) < 0 else 0
         onRight = 1 if (self.snake_position[0] - self.fruit_position[0]) < 0 else 0
-        return [(self.snake_position[0] - self.fruit_position[0]), (self.snake_position[1] - self.fruit_position[1])]
-
-    def draw(self):
+        # return [1 if (self.snake_position[0] - self.fruit_position[0]) > 0 else 0, 1 if (self.snake_position[1] - self.fruit_position[1]) > 0 else 0]
+        return [onDown, onRight]
+    
+    def draw(self, pygame, game_window):
+        if self.cobra is None:
+            self.cobra = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
+            # self.fruta = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
+            self.fruta = self.cobra
+        if self.gameOver:
+            self.cobra = pygame.Color(255, 0, 0)
+            self.fruta = self.cobra
         for pos in self.snake_body:
-            self.pygame.draw.rect(self.game_window, self.cobra,
-                            self.pygame.Rect(pos[0], pos[1], self.ppp, self.ppp))
-        self.pygame.draw.rect(self.game_window, self.fruta, self.pygame.Rect(
+            pygame.draw.rect(game_window, self.cobra,
+                            pygame.Rect(pos[0], pos[1], self.ppp, self.ppp))
+        pygame.draw.rect(game_window, self.fruta, pygame.Rect(
             self.fruit_position[0], self.fruit_position[1], self.ppp, self.ppp))
 
     def get_next_position(self, direction):
@@ -161,6 +163,7 @@ class Cascavel:
             self.score += 1000/self.moves
             self.moves = 0
             self.fruit_spawn = False
+            self.frutas += 1
         else:
             self.snake_body.pop()
 

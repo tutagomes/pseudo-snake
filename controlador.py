@@ -14,14 +14,14 @@ class Controle:
         self.cascavel.move(self.directions[move])
         self.movimentos_feitos = self.movimentos_feitos + 1
         self.mov_since_food = self.mov_since_food + 1
-        if self.last_score == self.cascavel.get_score() and self.mov_since_food > 1000:
+        if self.last_score == self.cascavel.frutas and self.mov_since_food > 2000:
             self.cascavel.game_over()
-        elif self.last_score < self.cascavel.get_score():
+        elif self.last_score < self.cascavel.frutas:
             self.mov_since_food = 0
-            self.last_score = self.cascavel.get_score()
+            self.last_score = self.cascavel.frutas
 
-    def draw(self):
-        self.cascavel.draw()
+    def draw(self, pygame, game_window):
+        self.cascavel.draw(pygame, game_window)
 
     def is_dead(self):
         return self.cascavel.is_game_over()

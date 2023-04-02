@@ -11,19 +11,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import differential_evolution
 
-snake_speed = 500
+snake_speed = 1000
 
-directions = ['RIGHT', 'UP', 'LEFT']
+directions = ['RIGHT', 'UP', 'LEFT']    
 # obstaculos = [[10, 10], [50, 50], [50, 60], [50, 70], [50, 80]]
 obstaculos = []
 # Window size
-window_x = 1000
-window_y = 1000
+window_x = 600
+window_y = 600
 # window_x = 1000
 # window_y = 1000
 # pixels por ponto
 # variável que auxilia no desenho das cobras, organização do tabuleiro, limites e obstaculos
-ppp = 40
+ppp = 4
 n_cobrinhas = 50
 
 # defining colors
@@ -60,11 +60,11 @@ def drawAll(cobra = None):
 
     for obs in obstaculos:
         pygame.draw.rect(game_window, white, pygame.Rect(obs[0], obs[1], ppp, ppp))
-
+    a = 80
     if cobra:
-        cobra.draw()
+       cobra.draw(pygame, game_window)
     for cobra in cobrinhas:
-        cobra.draw()
+        cobra.draw(pygame, game_window)
     fps.tick(snake_speed)
     pygame.display.update()
 
@@ -72,9 +72,7 @@ drawAll()
 def run():
     while True:
         mortas = 0
-        for event in pygame.event.get():
-            a = 37
-            # print(event)
+        pygame.event.get()
         for cobra in cobrinhas:
             cobra.move()
             mortas += cobra.is_dead() if 1 else 0
@@ -89,9 +87,7 @@ def fun(x, *data):
     w = x[5*6:].reshape((6, 3))
     window_x = data[0]
     window_y = data[1]
-    pygame = data[2]
-    game_window = data[3]
-    controlador = Controle(Cascavel([window_x, window_y], pygame, game_window, 40, []), Brain(h=h, w=w))
+    controlador = Controle(Cascavel([window_x, window_y], 4, []), Brain(h=h, w=w))
     while True:
         pygame.event.get()
         drawAll(controlador)
@@ -100,8 +96,9 @@ def fun(x, *data):
             return -controlador.get_score()
 
 # run()
-args = [window_x, window_y, pygame, game_window, obstaculos]
-result = differential_evolution(fun, [(-1, 1) for n in range(5*6+6*3)], args=args, maxiter=5, disp=True)
+# args = [window_x, window_y, pygame, game_window, obstaculos]
+args = [window_x, window_y]
+result = differential_evolution(fun, [(-100, 100) for n in range(5*6+6*3)], args=args, maxiter=300, disp=True, polish=False, updating='deferred')
 
 print(result)
 print(result.x)
