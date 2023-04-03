@@ -35,7 +35,7 @@ def fun(x, *data):
 
 def optimize():
     args = [window_x, window_y]
-    result = differential_evolution(fun, [(-100, 100) for n in range(5*6+6*3)], args=args, maxiter=300, disp=True, polish=False, updating='deferred', workers=-1)
+    result = differential_evolution(fun, [(-100, 100) for n in range(5*6+6*3)], args=args, maxiter=100, disp=True, polish=False, updating='deferred', workers=-1)
     print(result)
     print(result.x)
     time.sleep(2)

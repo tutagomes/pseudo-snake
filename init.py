@@ -73,10 +73,10 @@ def drawAll(cobra = None):
         pygame.draw.rect(game_window, white, pygame.Rect(obs[0], obs[1], ppp, ppp))
 
     if cobra:
-       cobra.draw()
+       cobra.draw(pygame, game_window)
 
     for cobra in cobrinhas:
-        cobra.draw()
+        cobra.draw(pygame, game_window)
  
     fps.tick(snake_speed)
     pygame.display.update()
@@ -99,7 +99,7 @@ def run():
 
 h = np.array(pesos[:5*6]).reshape((5, 6))
 w = np.array(pesos[5*6:]).reshape((6, 3))
-controlador = Controle(Cascavel([window_x, window_y], pygame, game_window, ppp, []), Brain(h=h, w=w))
+controlador = Controle(Cascavel([window_x, window_y], ppp, []), Brain(h=h, w=w))
 while True:
     pygame.event.get()
     drawAll(controlador)

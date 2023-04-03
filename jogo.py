@@ -33,6 +33,8 @@ class Cascavel:
         self.change_to = self.direction
     
         # initial score
+        self.cobra = None
+        self.fruta = None
         self.score = 0
         self.moves = 0
         self.frutas = 0

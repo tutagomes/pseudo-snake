@@ -98,7 +98,7 @@ def fun(x, *data):
 # run()
 # args = [window_x, window_y, pygame, game_window, obstaculos]
 args = [window_x, window_y]
-result = differential_evolution(fun, [(-100, 100) for n in range(5*6+6*3)], args=args, maxiter=300, disp=True, polish=False, updating='deferred')
+result = differential_evolution(fun, [(-100, 100) for n in range(5*6+6*3)], args=args, maxiter=1000, disp=True, polish=False, updating='deferred')
 
 print(result)
 print(result.x)
