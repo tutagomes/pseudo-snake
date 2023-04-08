@@ -13,6 +13,7 @@ class Cascavel:
         # defining snake default position
         x_max = tabuleiro[0] - ppp
         y_max = tabuleiro[1] - ppp
+        # Se for aleatório, deve gerar uma posição da fruta e da cobra aleatoriamente no mapa
         if aleatorio:
             self.snake_position = [random.randint(1, x_max/ppp)*ppp, random.randint(1, y_max/ppp)*ppp]
             self.snake_body = [[self.snake_position[0], self.snake_position[1]],
@@ -21,9 +22,9 @@ class Cascavel:
                 [self.snake_position[0] + 3*ppp, self.snake_position[1]],
                 [self.snake_position[0] + 4*ppp, self.snake_position[1]]
             ]
-                    # fruit position
             self.fruit_position = [random.randrange(1, ((tabuleiro[0] - 2*ppp)//ppp)) * ppp, random.randrange(1, ((tabuleiro[1] - 2*ppp)//ppp)) * ppp]
         else:
+            # Caso contrario, fixar em 300 e 100
             self.snake_position = [300, 300]
             self.snake_body = [[self.snake_position[0], self.snake_position[1]],
                 [self.snake_position[0] + ppp, self.snake_position[1]],
@@ -36,18 +37,15 @@ class Cascavel:
         self.tabuleiro = tabuleiro
         self.fruit_spawn = True
         self.gameOver = False
-        # setting default snake direction towards
-        # right
-        self.direction = 'RIGHT'
-        self.change_to = self.direction
-    
-        # initial score
-        self.cobra = None
-        self.fruta = None
+
+        # definições de pontuação
         self.score = 0
         self.moves = 0
         self.frutas = 0
-    # displaying Score function
+
+        # Configuração de cores de desenho
+        self.cobra = None
+        self.fruta = None
 
     def get_direction(self):
         if self.snake_body[0][0] == self.snake_body[1][0] and self.snake_body[0][1] < self.snake_body[1][1]: # Estou subindo
@@ -93,6 +91,9 @@ class Cascavel:
     def get_score(self):
         return self.score
     
+    def get_fruits(self):
+        return self.frutas
+    
     def is_game_over(self):
         return self.gameOver
 
@@ -122,7 +123,6 @@ class Cascavel:
     def get_next_position(self, direction):
         position = [self.snake_position[0], self.snake_position[1]]
         direcao = self.get_direction()
-        # offset = 10
         offset = self.ppp
         if direcao == 'UP': # Estou subindo
             if direction == 'UP': # Ir pra frente
@@ -154,15 +154,7 @@ class Cascavel:
                 position[1] += offset
         return position
 
-    def move(self, direction):
-        if self.gameOver:
-            return
-
-        # Moving the snake
-        position = self.get_next_position(direction)
-        self.snake_position[0] = position[0]
-        self.snake_position[1] = position[1]
-
+    def __have_scored(self):
         # Snake body growing mechanism
         # if fruits and snakes collide then scores
         # will be incremented by 10
@@ -178,6 +170,18 @@ class Cascavel:
         else:
             self.snake_body.pop()
 
+    def move(self, direction):
+        if self.gameOver:
+            return
+
+        # Moving the snake
+        position = self.get_next_position(direction)
+        self.snake_position[0] = position[0]
+        self.snake_position[1] = position[1]
+
+        # vamos calcular o quanto a cobra ganhou
+        self.__have_scored()
+
         if not self.fruit_spawn:
            self.fruit_position = [random.randrange(1, ((self.tabuleiro[0] - 2*self.ppp)//self.ppp)) *self.ppp,
                         random.randrange(1, ((self.tabuleiro[1] - 2*self.ppp)//self.ppp)) * self.ppp]
@@ -185,20 +189,14 @@ class Cascavel:
         self.fruit_spawn = True
     
         # Game Over conditions
-        if self.snake_position[0] < 0 or self.snake_position[0] > self.tabuleiro[0]-10:
+        # Se bateu na borda do tabuleiro
+        if self.snake_position[0] < 0 or self.snake_position[0] > self.tabuleiro[0] - self.ppp:
             self.game_over()
-        if self.snake_position[1] < 0 or self.snake_position[1] > self.tabuleiro[1]-10:
-            self.game_over()
-    
-        # Touching the snake body
-        # for block in self.snake_body[1:]:
-        #     if self.snake_position[0] == block[0] and self.snake_position[1] == block[1]:
-        #         self.game_over()
-        if (self.snake_position in self.obstaculos) or (self.snake_position in self.snake_body[1:]):
+        if self.snake_position[1] < 0 or self.snake_position[1] > self.tabuleiro[1] - self.ppp:
             self.game_over()
 
-    def smart_move(self):
-        move = self.brain.get_move(self)
-        self.move(move)
+        # Se bateu no proprio corpo
+        if (self.snake_position in self.obstaculos) or (self.snake_position in self.snake_body[1:]):
+            self.game_over()
 
     
