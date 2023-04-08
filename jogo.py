@@ -7,23 +7,32 @@ class Cascavel:
     # Onde ppp é uma variável de controle (pixels por ponto) que determina uma melhor conversão entre o que é mostrado na tela e o que é o jogo real
     # Por exemplo, para calcular o x_max, tem-se a largura total da tela menos o ppp para impedir que a cobrinha já comece na beirada do tabuleiro
 
-    def __init__(self, tabuleiro, ppp, obstaculos):
+    def __init__(self, tabuleiro, ppp, obstaculos, aleatorio = False):
         self.obstaculos = obstaculos
         self.ppp = ppp
         # defining snake default position
         x_max = tabuleiro[0] - ppp
         y_max = tabuleiro[1] - ppp
-        self.snake_position = [random.randint(1, x_max/ppp)*ppp, random.randint(1, y_max/ppp)*ppp]
-        self.snake_body = [[self.snake_position[0], self.snake_position[1]],
+        if aleatorio:
+            self.snake_position = [random.randint(1, x_max/ppp)*ppp, random.randint(1, y_max/ppp)*ppp]
+            self.snake_body = [[self.snake_position[0], self.snake_position[1]],
                 [self.snake_position[0] + ppp, self.snake_position[1]],
                 [self.snake_position[0] + 2*ppp, self.snake_position[1]],
                 [self.snake_position[0] + 3*ppp, self.snake_position[1]],
                 [self.snake_position[0] + 4*ppp, self.snake_position[1]]
             ]
-
-        # fruit position
-        self.fruit_position = [random.randrange(1, ((tabuleiro[0] - 2*ppp)//ppp)) * ppp,
-                        random.randrange(1, ((tabuleiro[1] - 2*ppp)//ppp)) * ppp]
+                    # fruit position
+            self.fruit_position = [random.randrange(1, ((tabuleiro[0] - 2*ppp)//ppp)) * ppp, random.randrange(1, ((tabuleiro[1] - 2*ppp)//ppp)) * ppp]
+        else:
+            self.snake_position = [300, 300]
+            self.snake_body = [[self.snake_position[0], self.snake_position[1]],
+                [self.snake_position[0] + ppp, self.snake_position[1]],
+                [self.snake_position[0] + 2*ppp, self.snake_position[1]],
+                [self.snake_position[0] + 3*ppp, self.snake_position[1]],
+                [self.snake_position[0] + 4*ppp, self.snake_position[1]]
+            ]
+                    # fruit position
+            self.fruit_position = [100, 100]
         self.tabuleiro = tabuleiro
         self.fruit_spawn = True
         self.gameOver = False
@@ -60,19 +69,19 @@ class Cascavel:
 
         new_position = self.get_next_position("LEFT")
         if is_valid_position(new_position):
-            possible_moves.append(1)
+            possible_moves.append(0.9)
         else:
             possible_moves.append(0)
         
         new_position = self.get_next_position("UP")
         if is_valid_position(new_position):
-            possible_moves.append(1)
+            possible_moves.append(0.9)
         else:
             possible_moves.append(0)
 
         new_position = self.get_next_position("RIGHT")
         if is_valid_position(new_position):
-            possible_moves.append(1)
+            possible_moves.append(0.9)
         else:
             possible_moves.append(0)
 
@@ -91,8 +100,8 @@ class Cascavel:
         self.gameOver = True
 
     def get_rel_food_position(self):
-        onDown = 1 if (self.snake_position[1] - self.fruit_position[1]) < 0 else 0
-        onRight = 1 if (self.snake_position[0] - self.fruit_position[0]) < 0 else 0
+        onDown = (self.snake_position[1] - self.fruit_position[1]) / self.tabuleiro[1]
+        onRight = (self.snake_position[0] - self.fruit_position[0]) / self.tabuleiro[0]
         # return [1 if (self.snake_position[0] - self.fruit_position[0]) > 0 else 0, 1 if (self.snake_position[1] - self.fruit_position[1]) > 0 else 0]
         return [onDown, onRight]
     
@@ -162,7 +171,7 @@ class Cascavel:
         self.score += 0.5
         self.snake_body.insert(0, list(self.snake_position))
         if self.snake_position[0] == self.fruit_position[0] and self.snake_position[1] == self.fruit_position[1]:
-            self.score += 1000/self.moves
+            self.score += 1000/(0.25 + (self.moves/10))
             self.moves = 0
             self.fruit_spawn = False
             self.frutas += 1

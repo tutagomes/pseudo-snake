@@ -9,8 +9,10 @@ class Controle:
 
     def move(self):
         movimentos = self.cascavel.get_possible_moves()
-        food_position = self.cascavel.get_rel_food_position()        
-        move = self.brain.get_move(movimentos + food_position)
+        food_position = self.cascavel.get_rel_food_position()
+        head_position = [self.cascavel.snake_position[0]/self.cascavel.tabuleiro[0], self.cascavel.snake_position[1]/self.cascavel.tabuleiro[1]]
+        tail_position = [(self.cascavel.snake_body[len(self.cascavel.snake_body) - 1][0])/self.cascavel.tabuleiro[0], (self.cascavel.snake_body[len(self.cascavel.snake_body) - 1][1])/self.cascavel.tabuleiro[1]]
+        move = self.brain.get_move(movimentos + food_position + head_position + tail_position)
         self.cascavel.move(self.directions[move])
         self.movimentos_feitos = self.movimentos_feitos + 1
         self.mov_since_food = self.mov_since_food + 1
