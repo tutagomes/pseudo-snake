@@ -81,9 +81,6 @@ def drawAll(cobra = None):
 
     if cobra:
        cobra.draw(pygame, game_window)
-
-    for cobra in cobrinhas:
-        cobra.draw(pygame, game_window)
  
     fps.tick(snake_speed)
     pygame.display.update()
@@ -107,9 +104,10 @@ def run():
 x_size = 9
 h_size = 12
 
-h = np.array(pesos[:x_size*h_size]).reshape((x_size, h_size))
-w = np.array(pesos[x_size*h_size:]).reshape((h_size, 3))
-controlador = Controle(Cascavel([window_x, window_y], ppp, []), Brain(h=h, w=w))
+h1 = np.array(pesos[:x_size*h_size]).reshape((x_size, h_size))
+h2 = np.array(pesos[x_size*h_size:(x_size*h_size + h_size*h_size)]).reshape((h_size, h_size))
+w = np.array(pesos[(x_size*h_size + h_size*h_size):]).reshape((h_size, 3))
+controlador = Controle(Cascavel([window_x, window_y], ppp, []), Brain(h1=h1, h2=h2, w=w))
 while True:
     pygame.event.get()
     drawAll(controlador)
@@ -117,8 +115,7 @@ while True:
     if controlador.is_dead():
         print(controlador.get_score())
         break
-# print(result)
-# print(result.x)
+
 time.sleep(2)
 pygame.quit()
 quit()

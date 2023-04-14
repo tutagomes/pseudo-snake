@@ -2,7 +2,7 @@
 import time
 from jogo import Cascavel
 from controlador import Controle
-from brain import Brain
+from brain import Brain2, Brain, Brain3
 from scipy.optimize import differential_evolution
 import numpy as np
 
@@ -19,7 +19,6 @@ window_y = 600
 # pixels por ponto
 # variável que auxilia no desenho das cobras, organização do tabuleiro, limites e obstaculos
 ppp = 4
-n_cobrinhas = 50
 
 x_size = 9
 h_size = 12
@@ -29,22 +28,33 @@ def fun(x, *data):
     window_y = data[1]
     x_size = data[2]
     h_size = data[3]
-    h = x[:x_size*h_size].reshape((x_size, h_size))
-    w = x[x_size*h_size:].reshape((h_size, 3))
+    h1 = x[:x_size*h_size].reshape((x_size, h_size))
+    h2 = x[x_size*h_size:(x_size*h_size + h_size*h_size)].reshape((h_size, h_size))
+    w = x[(x_size*h_size + h_size*h_size):].reshape((h_size, 3))
     # pygame = data[2]
     # game_window = data[3]
-    controlador = Controle(Cascavel([window_x, window_y], 4, []), Brain(h=h, w=w))
+    controlador = Controle(Cascavel([window_x, window_y], 4, []), Brain(h1=h1, h2=h2, w=w))
     while True:
         controlador.move()
         if controlador.is_dead():
             return -controlador.get_score()
 
+# Define the callback function
+def print_iteration_time(xk, convergence):
+    global start_time
+    elapsed_time = time.time() - start_time
+    print(f"Iteration time: {elapsed_time:.2f} seconds")
+    start_time = time.time()  # Update the start_time for the next iteration
+
+# Set the initial start_time
+start_time = time.time()
+
 def optimize():
     args = [window_x, window_y, x_size, h_size]
-    result = differential_evolution(fun, [(-100, 100) for n in range(x_size*h_size+h_size*3)], args=args, maxiter=50, disp=True, polish=False, updating='deferred', workers=-1)
+    result = differential_evolution(fun, [(-100, 100) for n in range(x_size*h_size+h_size*h_size+h_size*3)], args=args, maxiter=100, disp=True, polish=False, workers=-1, updating='immediate', callback=print_iteration_time)
     print(result)
-    print(result.x)
-    with open(str(((-1)*result.fun)) +'.csv', 'w') as my_file:
+    print(str(((-1)*round(result.fun))) +'.csv')
+    with open(str(((-1)*round(result.fun))) +'.csv', 'w') as my_file:
         np.savetxt(my_file, result.x)
     time.sleep(2)
     quit()

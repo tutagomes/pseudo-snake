@@ -57,29 +57,30 @@ class Cascavel:
         elif self.snake_body[0][0] < self.snake_body[1][0] and self.snake_body[0][1] == self.snake_body[1][1]: # Estou indo pra esquerda
             return 'LEFT'
 
+    def is_valid_position(self, position, scale):
+        if (scale <= position[0] < (self.tabuleiro[0]) - scale) and (scale <= position[1] < (self.tabuleiro[1]) - scale ) and (position not in self.snake_body) and (position not in self.obstaculos):
+            return True
+        return False
+
     def get_possible_moves(self):
         possible_moves = []
-        scale = 10
-        def is_valid_position(position):
-            if (scale <= position[0] < (self.tabuleiro[0]) - scale) and (scale <= position[1] < (self.tabuleiro[1]) - scale ) and (position not in self.snake_body) and (position not in self.obstaculos):
-                return True
-            return False
+        scale = self.ppp
 
         new_position = self.get_next_position("LEFT")
-        if is_valid_position(new_position):
-            possible_moves.append(0.9)
+        if self.is_valid_position(new_position, scale):
+            possible_moves.append(1)
         else:
             possible_moves.append(0)
         
         new_position = self.get_next_position("UP")
-        if is_valid_position(new_position):
-            possible_moves.append(0.9)
+        if self.is_valid_position(new_position, scale):
+            possible_moves.append(1)
         else:
             possible_moves.append(0)
 
         new_position = self.get_next_position("RIGHT")
-        if is_valid_position(new_position):
-            possible_moves.append(0.9)
+        if self.is_valid_position(new_position, scale):
+            possible_moves.append(1)
         else:
             possible_moves.append(0)
 
@@ -158,12 +159,11 @@ class Cascavel:
         # Snake body growing mechanism
         # if fruits and snakes collide then scores
         # will be incremented by 10
-        if self.moves < 4:
-            self.moves = self.moves + 1
-        self.score += 0.5
+        self.score -= 0.5
         self.snake_body.insert(0, list(self.snake_position))
         if self.snake_position[0] == self.fruit_position[0] and self.snake_position[1] == self.fruit_position[1]:
-            self.score += 1000/(0.25 + (self.moves/10))
+            self.score += 10000
+            self.game_over()
             self.moves = 0
             self.fruit_spawn = False
             self.frutas += 1
@@ -191,12 +191,15 @@ class Cascavel:
         # Game Over conditions
         # Se bateu na borda do tabuleiro
         if self.snake_position[0] < 0 or self.snake_position[0] > self.tabuleiro[0] - self.ppp:
+            self.score -= 1000
             self.game_over()
         if self.snake_position[1] < 0 or self.snake_position[1] > self.tabuleiro[1] - self.ppp:
+            self.score -= 1000
             self.game_over()
 
         # Se bateu no proprio corpo
         if (self.snake_position in self.obstaculos) or (self.snake_position in self.snake_body[1:]):
+            self.score -= 1000
             self.game_over()
 
     

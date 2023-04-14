@@ -1,3 +1,5 @@
+import numpy as np
+
 class Controle:
     def __init__(self, cascavel, brain):
         self.cascavel = cascavel
@@ -12,7 +14,7 @@ class Controle:
         food_position = self.cascavel.get_rel_food_position()
         head_position = [self.cascavel.snake_position[0]/self.cascavel.tabuleiro[0], self.cascavel.snake_position[1]/self.cascavel.tabuleiro[1]]
         tail_position = [(self.cascavel.snake_body[len(self.cascavel.snake_body) - 1][0])/self.cascavel.tabuleiro[0], (self.cascavel.snake_body[len(self.cascavel.snake_body) - 1][1])/self.cascavel.tabuleiro[1]]
-        move = self.brain.get_move(movimentos + food_position + head_position + tail_position)
+        move =  self.brain.get_move(np.array(movimentos + food_position + head_position + tail_position, dtype=np.float32))
         self.cascavel.move(self.directions[move])
         self.movimentos_feitos = self.movimentos_feitos + 1
         self.mov_since_food = self.mov_since_food + 1

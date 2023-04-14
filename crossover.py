@@ -12,5 +12,5 @@ def crossover(fh, fw, mh, mw, cuts=2):
 
     cuts = rd.sample(range(size), k=cuts)
 
-    
+
 

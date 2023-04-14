@@ -3,7 +3,7 @@ import pygame
 import time
 from jogo import Cascavel
 from controlador import Controle
-from brain import Brain
+from brain import Brain, Brain2
 from scipy.optimize import differential_evolution
 
 snake_speed = 1000
@@ -63,14 +63,13 @@ def fun(x, *data):
     h_size = data[3]
     h = x[:x_size*h_size].reshape((x_size, h_size))
     w = x[x_size*h_size:].reshape((h_size, 3))
-    controlador = Controle(Cascavel([window_x, window_y], 4, []), Brain(h=h, w=w))
+    controlador = Controle(Cascavel([window_x, window_y], 4, []), Brain2(h=h, w=w))
     while True:
         controlador.move()
         pygame.event.get()
         drawAll(controlador.cascavel)
         if controlador.is_dead():
             return -controlador.get_score()
-
 
 args = [window_x, window_y, x_size, h_size]
 result = differential_evolution(fun, [(-100, 100) for n in range(x_size*h_size+h_size*3)], args=args, maxiter=1, disp=True, polish=False, updating='deferred')
