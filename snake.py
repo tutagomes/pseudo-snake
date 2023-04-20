@@ -3,7 +3,7 @@ import pygame
 import time
 from jogo import Cascavel
 from controlador import Controle
-from brain import Brain, Brain2
+from brain import Brain
 from scipy.optimize import differential_evolution
 
 snake_speed = 1000
@@ -56,14 +56,22 @@ drawAll()
 x_size = 9
 h_size = 12
 
+# Define the callback function
+def print_iteration_time(xk, convergence):
+    global start_time
+    elapsed_time = time.time() - start_time
+    print(f"Iteration time: {elapsed_time:.2f} seconds")
+    start_time = time.time()  # Update the start_time for the next iteration
+    
 def fun(x, *data):
     window_x = data[0]
     window_y = data[1]
     x_size = data[2]
     h_size = data[3]
-    h = x[:x_size*h_size].reshape((x_size, h_size))
-    w = x[x_size*h_size:].reshape((h_size, 3))
-    controlador = Controle(Cascavel([window_x, window_y], 4, []), Brain2(h=h, w=w))
+    h1 = x[:x_size*h_size].reshape((x_size, h_size))
+    h2 = x[x_size*h_size:(x_size*h_size + h_size*h_size)].reshape((h_size, h_size))
+    w = x[(x_size*h_size + h_size*h_size):].reshape((h_size, 3))
+    controlador = Controle(Cascavel([window_x, window_y], 4, []), Brain(h1=h1, h2=h2, w=w))
     while True:
         controlador.move()
         pygame.event.get()
@@ -72,7 +80,8 @@ def fun(x, *data):
             return -controlador.get_score()
 
 args = [window_x, window_y, x_size, h_size]
-result = differential_evolution(fun, [(-100, 100) for n in range(x_size*h_size+h_size*3)], args=args, maxiter=1, disp=True, polish=False, updating='deferred')
+result = differential_evolution(fun, [(-100, 100) for n in range(x_size*h_size+h_size*h_size+h_size*3)], args=args, maxiter=400, disp=True, polish=False, workers=1, updating='immediate', callback=print_iteration_time)
+
 
 print(result)
 print(result.x)

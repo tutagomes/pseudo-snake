@@ -2,7 +2,7 @@
 
 ```sh
 
-pip install pygame scipy tensorflow
+pip install pygame scipy 
 
 # para treinar visualizando
 python snake.py

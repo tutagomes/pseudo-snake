@@ -9,7 +9,7 @@ class Cascavel:
 
     def __init__(self, tabuleiro, ppp, obstaculos, aleatorio = False):
         self.aleatorio = aleatorio
-        self.posicoes_frutas = [[100, 100], [300, 300], [300, 100], [100, 400], [400, 500], [100, 100], [300, 300], [100, 100]]
+        self.posicoes_frutas = [[300, 100], [300, 300], [300, 100], [100, 400], [400, 500], [100, 100], [300, 300], [100, 100]]
         self.obstaculos = obstaculos
         self.ppp = ppp
         # defining snake default position
@@ -35,7 +35,7 @@ class Cascavel:
                 [self.snake_position[0] + 4*ppp, self.snake_position[1]]
             ]
                     # fruit position
-            self.fruit_position = [100, 100]
+            self.fruit_position = [300, 100]
         self.tabuleiro = tabuleiro
         self.fruit_spawn = True
         self.gameOver = False
