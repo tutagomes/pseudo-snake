@@ -8,6 +8,8 @@ class Cascavel:
     # Por exemplo, para calcular o x_max, tem-se a largura total da tela menos o ppp para impedir que a cobrinha já comece na beirada do tabuleiro
 
     def __init__(self, tabuleiro, ppp, obstaculos, aleatorio = False):
+        self.aleatorio = aleatorio
+        self.posicoes_frutas = [[100, 100], [300, 300], [300, 100], [100, 400], [400, 500], [100, 100], [300, 300], [100, 100]]
         self.obstaculos = obstaculos
         self.ppp = ppp
         # defining snake default position
@@ -163,7 +165,6 @@ class Cascavel:
         self.snake_body.insert(0, list(self.snake_position))
         if self.snake_position[0] == self.fruit_position[0] and self.snake_position[1] == self.fruit_position[1]:
             self.score += 10000
-            self.game_over()
             self.moves = 0
             self.fruit_spawn = False
             self.frutas += 1
@@ -183,18 +184,26 @@ class Cascavel:
         self.__have_scored()
 
         if not self.fruit_spawn:
-           self.fruit_position = [random.randrange(1, ((self.tabuleiro[0] - 2*self.ppp)//self.ppp)) *self.ppp,
-                        random.randrange(1, ((self.tabuleiro[1] - 2*self.ppp)//self.ppp)) * self.ppp]
+           if self.aleatorio:
+                self.fruit_position = [random.randrange(1, ((self.tabuleiro[0] - 2*self.ppp)//self.ppp)) *self.ppp,
+                            random.randrange(1, ((self.tabuleiro[1] - 2*self.ppp)//self.ppp)) * self.ppp]
+           else:
+                if len(self.posicoes_frutas) > self.frutas + 1:
+                    self.fruit_position[0] = self.posicoes_frutas[self.frutas][0]
+                    self.fruit_position[1] = self.posicoes_frutas[self.frutas][1]
+                else:
+                    self.game_over()
+
             
         self.fruit_spawn = True
     
         # Game Over conditions
         # Se bateu na borda do tabuleiro
         if self.snake_position[0] < 0 or self.snake_position[0] > self.tabuleiro[0] - self.ppp:
-            self.score -= 1000
+            # self.score -= 1000
             self.game_over()
         if self.snake_position[1] < 0 or self.snake_position[1] > self.tabuleiro[1] - self.ppp:
-            self.score -= 1000
+            # self.score -= 1000
             self.game_over()
 
         # Se bateu no proprio corpo

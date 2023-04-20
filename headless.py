@@ -51,7 +51,7 @@ start_time = time.time()
 
 def optimize():
     args = [window_x, window_y, x_size, h_size]
-    result = differential_evolution(fun, [(-100, 100) for n in range(x_size*h_size+h_size*h_size+h_size*3)], args=args, maxiter=100, disp=True, polish=False, workers=-1, updating='immediate', callback=print_iteration_time)
+    result = differential_evolution(fun, [(-100, 100) for n in range(x_size*h_size+h_size*h_size+h_size*3)], args=args, maxiter=300, disp=True, polish=False, workers=-1, updating='immediate', callback=print_iteration_time)
     print(result)
     print(str(((-1)*round(result.fun))) +'.csv')
     with open(str(((-1)*round(result.fun))) +'.csv', 'w') as my_file:
