@@ -18,10 +18,10 @@ class Controle:
         self.cascavel.move(self.directions[move])
         self.movimentos_feitos = self.movimentos_feitos + 1
         self.mov_since_food = self.mov_since_food + 1
-        if self.last_score == self.cascavel.frutas and self.mov_since_food > 500:
+        if self.last_score == self.cascavel.frutas and self.mov_since_food > 120:
             self.cascavel.game_over()
         elif self.last_score < self.cascavel.frutas:
-            self.mov_since_food = 0
+            # self.mov_since_food = 0
             self.last_score = self.cascavel.frutas
 
     def draw(self, pygame, game_window):

@@ -9,13 +9,12 @@ from brain import Brain
 
 import random as rd
 import numpy as np
-import matplotlib.pyplot as plt
 
 snake_speed = 120
 import argparse
 
 argParser = argparse.ArgumentParser()
-argParser.add_argument("-f", "--file", help="csv file")
+argParser.add_argument("-f", "--file", help="csv file", default="38436.csv")
 args = argParser.parse_args()
 
 # Com 126000 pontos
@@ -26,8 +25,6 @@ pesos = np.loadtxt(args.file)
 
 import random as rd
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.optimize import differential_evolution
 
 snake_speed = 100
 
@@ -35,13 +32,13 @@ directions = ['RIGHT', 'UP', 'LEFT']
 # obstaculos = [[10, 10], [50, 50], [50, 60], [50, 70], [50, 80]]
 obstaculos = []
 # Window size
-window_x = 500
-window_y = 500
+window_x = 1000
+window_y = 1000
 # window_x = 1000
 # window_y = 1000
 # pixels por ponto
 # variável que auxilia no desenho das cobras, organização do tabuleiro, limites e obstaculos
-ppp = 10
+ppp = 4
 n_cobrinhas = 50
 
 # defining colors
@@ -86,20 +83,6 @@ def drawAll(cobra = None):
     pygame.display.update()
 
 drawAll()
-def run():
-    while True:
-        mortas = 0
-        for event in pygame.event.get():
-            a = 37
-            # print(event)
-        for cobra in cobrinhas:
-            cobra.move()
-            mortas += cobra.is_dead() if 1 else 0
-        
-        if mortas == len(cobrinhas):
-            for cobra in cobrinhas:
-                print(cobra.get_score())
-            break
 
 x_size = 9
 h_size = 12
@@ -107,7 +90,8 @@ h_size = 12
 h1 = np.array(pesos[:x_size*h_size]).reshape((x_size, h_size))
 h2 = np.array(pesos[x_size*h_size:(x_size*h_size + h_size*h_size)]).reshape((h_size, h_size))
 w = np.array(pesos[(x_size*h_size + h_size*h_size):]).reshape((h_size, 3))
-controlador = Controle(Cascavel([window_x, window_y], ppp, []), Brain(h1=h1, h2=h2, w=w))
+controlador = Controle(Cascavel([window_x/ppp, window_y/ppp], ppp, []), Brain(h1=h1, h2=h2, w=w))
+drawAll(controlador)
 while True:
     pygame.event.get()
     drawAll(controlador)

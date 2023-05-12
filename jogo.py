@@ -9,33 +9,33 @@ class Cascavel:
 
     def __init__(self, tabuleiro, ppp, obstaculos, aleatorio = False):
         self.aleatorio = aleatorio
-        self.posicoes_frutas = [[300, 100], [300, 300], [300, 100], [100, 400], [400, 500], [100, 100], [300, 300], [100, 100]]
+        self.posicoes_frutas = [(17, 28), (20, 19), (26, 29), (5, 22), (8, 10), (8, 30), (12, 18), (14, 13)]
         self.obstaculos = obstaculos
         self.ppp = ppp
         # defining snake default position
-        x_max = tabuleiro[0] - ppp
-        y_max = tabuleiro[1] - ppp
+        x_max = tabuleiro[0]
+        y_max = tabuleiro[1]
         # Se for aleatório, deve gerar uma posição da fruta e da cobra aleatoriamente no mapa
         if aleatorio:
-            self.snake_position = [random.randint(1, x_max/ppp)*ppp, random.randint(1, y_max/ppp)*ppp]
+            self.snake_position = [random.randint(1, x_max), random.randint(1, y_max)]
             self.snake_body = [[self.snake_position[0], self.snake_position[1]],
-                [self.snake_position[0] + ppp, self.snake_position[1]],
-                [self.snake_position[0] + 2*ppp, self.snake_position[1]],
-                [self.snake_position[0] + 3*ppp, self.snake_position[1]],
-                [self.snake_position[0] + 4*ppp, self.snake_position[1]]
+                [self.snake_position[0] + 1, self.snake_position[1]],
+                [self.snake_position[0] + 2, self.snake_position[1]],
+                [self.snake_position[0] + 3, self.snake_position[1]],
+                [self.snake_position[0] + 4, self.snake_position[1]]
             ]
-            self.fruit_position = [random.randrange(1, ((tabuleiro[0] - 2*ppp)//ppp)) * ppp, random.randrange(1, ((tabuleiro[1] - 2*ppp)//ppp)) * ppp]
+            self.fruit_position = [random.randrange(1, (tabuleiro[0])), random.randrange(1, (tabuleiro[1]))]
         else:
             # Caso contrario, fixar em 300 e 100
-            self.snake_position = [300, 300]
+            self.snake_position = [30, 30]
             self.snake_body = [[self.snake_position[0], self.snake_position[1]],
-                [self.snake_position[0] + ppp, self.snake_position[1]],
-                [self.snake_position[0] + 2*ppp, self.snake_position[1]],
-                [self.snake_position[0] + 3*ppp, self.snake_position[1]],
-                [self.snake_position[0] + 4*ppp, self.snake_position[1]]
+                [self.snake_position[0] + 1, self.snake_position[1]],
+                [self.snake_position[0] + 2, self.snake_position[1]],
+                [self.snake_position[0] + 3, self.snake_position[1]],
+                [self.snake_position[0] + 4, self.snake_position[1]]
             ]
                     # fruit position
-            self.fruit_position = [300, 100]
+            self.fruit_position = [30, 10]
         self.tabuleiro = tabuleiro
         self.fruit_spawn = True
         self.gameOver = False
@@ -60,13 +60,13 @@ class Cascavel:
             return 'LEFT'
 
     def is_valid_position(self, position, scale):
-        if (scale <= position[0] < (self.tabuleiro[0]) - scale) and (scale <= position[1] < (self.tabuleiro[1]) - scale ) and (position not in self.snake_body) and (position not in self.obstaculos):
+        if (scale <= position[0] <= (self.tabuleiro[0])) and (scale <= position[1] <= (self.tabuleiro[1]) - scale ) and (position not in self.snake_body) and (position not in self.obstaculos):
             return True
         return False
 
     def get_possible_moves(self):
         possible_moves = []
-        scale = self.ppp
+        scale = 0
 
         new_position = self.get_next_position("LEFT")
         if self.is_valid_position(new_position, scale):
@@ -104,29 +104,36 @@ class Cascavel:
         self.gameOver = True
 
     def get_rel_food_position(self):
-        onDown = (self.snake_position[1] - self.fruit_position[1]) / self.tabuleiro[1]
-        onRight = (self.snake_position[0] - self.fruit_position[0]) / self.tabuleiro[0]
+        on_down = (self.snake_position[1] - self.fruit_position[1]) / self.tabuleiro[1]
+        on_right = (self.snake_position[0] - self.fruit_position[0]) / self.tabuleiro[0]
         # return [1 if (self.snake_position[0] - self.fruit_position[0]) > 0 else 0, 1 if (self.snake_position[1] - self.fruit_position[1]) > 0 else 0]
-        return [onDown, onRight]
-    
+        return [on_down, on_right]
+
     def draw(self, pygame, game_window):
         if self.cobra is None:
             self.cobra = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
-            # self.fruta = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
             self.fruta = self.cobra
         if self.gameOver:
             self.cobra = pygame.Color(255, 0, 0)
             self.fruta = self.cobra
-        for pos in self.snake_body:
+
+        window_width, window_height = game_window.get_size()
+        self.ppp = min(window_width / self.tabuleiro[0], window_height / self.tabuleiro[1])
+
+        for idx, pos in enumerate(self.snake_body):
             pygame.draw.rect(game_window, self.cobra,
-                            pygame.Rect(pos[0], pos[1], self.ppp, self.ppp))
+                            pygame.Rect(pos[0] * self.ppp, pos[1] * self.ppp, self.ppp, self.ppp))
+            
+        # for fruta in self.posicoes_frutas:
+        #     pygame.draw.rect(game_window, self.fruta, pygame.Rect(
+        #     fruta[0] * self.ppp, fruta[1] * self.ppp, self.ppp, self.ppp))
         pygame.draw.rect(game_window, self.fruta, pygame.Rect(
-            self.fruit_position[0], self.fruit_position[1], self.ppp, self.ppp))
+            self.fruit_position[0] * self.ppp, self.fruit_position[1] * self.ppp, self.ppp, self.ppp))
 
     def get_next_position(self, direction):
         position = [self.snake_position[0], self.snake_position[1]]
         direcao = self.get_direction()
-        offset = self.ppp
+        offset = 1
         if direcao == 'UP': # Estou subindo
             if direction == 'UP': # Ir pra frente
                 position[1] -= offset
@@ -161,10 +168,10 @@ class Cascavel:
         # Snake body growing mechanism
         # if fruits and snakes collide then scores
         # will be incremented by 10
-        self.score -= 0.5
+        self.score -= 2/(1 + self.frutas)
         self.snake_body.insert(0, list(self.snake_position))
         if self.snake_position[0] == self.fruit_position[0] and self.snake_position[1] == self.fruit_position[1]:
-            self.score += 10000
+            self.score += 1000
             self.moves = 0
             self.fruit_spawn = False
             self.frutas += 1
@@ -185,8 +192,8 @@ class Cascavel:
 
         if not self.fruit_spawn:
            if self.aleatorio:
-                self.fruit_position = [random.randrange(1, ((self.tabuleiro[0] - 2*self.ppp)//self.ppp)) *self.ppp,
-                            random.randrange(1, ((self.tabuleiro[1] - 2*self.ppp)//self.ppp)) * self.ppp]
+                self.fruit_position = [random.randrange(1, (self.tabuleiro[0])),
+                            random.randrange(1, (self.tabuleiro[1]))]
            else:
                 if len(self.posicoes_frutas) > self.frutas + 1:
                     self.fruit_position[0] = self.posicoes_frutas[self.frutas][0]
@@ -199,16 +206,16 @@ class Cascavel:
     
         # Game Over conditions
         # Se bateu na borda do tabuleiro
-        if self.snake_position[0] < 0 or self.snake_position[0] > self.tabuleiro[0] - self.ppp:
-            # self.score -= 1000
-            self.game_over()
-        if self.snake_position[1] < 0 or self.snake_position[1] > self.tabuleiro[1] - self.ppp:
-            # self.score -= 1000
-            self.game_over()
+        if self.snake_position[0] < 0 or self.snake_position[0] > self.tabuleiro[0]:
+            self.score -= 100
+            # self.game_over()
+        if self.snake_position[1] < 0 or self.snake_position[1] > self.tabuleiro[1] :
+            self.score -= 100
+            # self.game_over()
 
         # Se bateu no proprio corpo
         if (self.snake_position in self.obstaculos) or (self.snake_position in self.snake_body[1:]):
-            self.score -= 1000
-            self.game_over()
+            self.score -= 100
+            # self.game_over()
 
     
