@@ -59,6 +59,17 @@ class Cascavel:
         elif self.snake_body[0][0] < self.snake_body[1][0] and self.snake_body[0][1] == self.snake_body[1][1]: # Estou indo pra esquerda
             return 'LEFT'
 
+    def get_direction_on_array(self):
+        direcao = self.get_direction()
+        if direcao == 'UP':
+            return [1, 0, 0, 0]
+        if direcao == 'DOWN':
+            return [0, 1, 0, 0]
+        if direcao == 'RIGHT':
+            return [0, 0, 1, 0]
+        if direcao == 'LEFT':
+            return [0, 0, 0, 1]
+
     def is_valid_position(self, position, scale):
         if (scale <= position[0] <= (self.tabuleiro[0])) and (scale <= position[1] <= (self.tabuleiro[1]) - scale ) and (position not in self.snake_body) and (position not in self.obstaculos):
             return True
@@ -104,10 +115,25 @@ class Cascavel:
         self.gameOver = True
 
     def get_rel_food_position(self):
-        on_down = (self.snake_position[1] - self.fruit_position[1]) / self.tabuleiro[1]
-        on_right = (self.snake_position[0] - self.fruit_position[0]) / self.tabuleiro[0]
+        on_down = (self.snake_position[1] < self.fruit_position[1])
+        on_right = (self.snake_position[0] < self.fruit_position[0])
+        retorno = []
+        if on_down:
+            retorno.append(0)
+            retorno.append(1)
+        else:
+            retorno.append(0)
+            retorno.append(1)
+        
+        if on_right:
+            retorno.append(0)
+            retorno.append(1)
+        else:
+            retorno.append(1)
+            retorno.append(0)
         # return [1 if (self.snake_position[0] - self.fruit_position[0]) > 0 else 0, 1 if (self.snake_position[1] - self.fruit_position[1]) > 0 else 0]
-        return [on_down, on_right]
+        return retorno
+        # 3return [on_down, on_right]
 
     def draw(self, pygame, game_window):
         if self.cobra is None:
@@ -208,14 +234,14 @@ class Cascavel:
         # Se bateu na borda do tabuleiro
         if self.snake_position[0] < 0 or self.snake_position[0] > self.tabuleiro[0]:
             self.score -= 100
-            # self.game_over()
+            self.game_over()
         if self.snake_position[1] < 0 or self.snake_position[1] > self.tabuleiro[1] :
             self.score -= 100
-            # self.game_over()
+            self.game_over()
 
         # Se bateu no proprio corpo
         if (self.snake_position in self.obstaculos) or (self.snake_position in self.snake_body[1:]):
             self.score -= 100
-            # self.game_over()
+            self.game_over()
 
     

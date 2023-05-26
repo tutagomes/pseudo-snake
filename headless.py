@@ -20,8 +20,8 @@ window_y = 1000
 # variável que auxilia no desenho das cobras, organização do tabuleiro, limites e obstaculos
 ppp = 4
 
-x_size = 9
-h_size = 12
+x_size = 11
+h_size = 256
 
 def fun(x, *data):
     window_x = data[0]
@@ -30,11 +30,10 @@ def fun(x, *data):
     h_size = data[3]
     pixelpp = data[4]
     h1 = x[:x_size*h_size].reshape((x_size, h_size))
-    h2 = x[x_size*h_size:(x_size*h_size + h_size*h_size)].reshape((h_size, h_size))
-    w = x[(x_size*h_size + h_size*h_size):].reshape((h_size, 3))
+    w = x[(x_size*h_size):].reshape((h_size, 3))
     # pygame = data[2]
     # game_window = data[3]
-    controlador = Controle(Cascavel([window_x/pixelpp, window_y/pixelpp], pixelpp, []), Brain(h1=h1, h2=h2, w=w))
+    controlador = Controle(Cascavel([window_x/pixelpp, window_y/pixelpp], pixelpp, []), Brain(h1=h1, w=w))
     while True:
         controlador.move()
         if controlador.is_dead():
@@ -52,7 +51,7 @@ start_time = time.time()
 
 def optimize():
     args = [window_x, window_y, x_size, h_size, ppp]
-    result = differential_evolution(fun, [(-100, 100) for n in range(x_size*h_size+h_size*h_size+h_size*3)], args=args, maxiter=500, disp=True, polish=False, workers=-1, updating='immediate', callback=print_iteration_time)
+    result = differential_evolution(fun, [(-100, 100) for n in range(x_size*h_size+h_size*3)], args=args, maxiter=100, disp=True, polish=False, workers=1, updating='deferred', callback=print_iteration_time)
     print(result)
     print(str(((-1)*round(result.fun))) +'.csv')
     with open(str(((-1)*round(result.fun))) +'.csv', 'w') as my_file:
