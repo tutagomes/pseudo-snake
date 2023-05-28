@@ -122,8 +122,8 @@ class Cascavel:
             retorno.append(0)
             retorno.append(1)
         else:
-            retorno.append(0)
             retorno.append(1)
+            retorno.append(0)
         
         if on_right:
             retorno.append(0)
