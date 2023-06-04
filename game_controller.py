@@ -1,4 +1,5 @@
 from cycle_generator import create_path
+from drawpath import draw_path
 from jogo import Cascavel
 import numpy as np
 import logging
@@ -14,6 +15,7 @@ class Controller:
         for i, pos in enumerate(caminho):
             self.path[pos[0]][pos[1]] = i + 1
         logging.debug("Path Criado")
+        draw_path(dimensao, caminho)
     # retorna o array da direcao em que a cobra esta indo
     
     def get_direction_on_array(self):

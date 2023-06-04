@@ -78,7 +78,7 @@ class Cascavel:
             self.cobra = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
             self.fruta = self.cobra
         if self.gameOver:
-            self.cobra = pygame.Color(255, 0, 0)
+            self.cobra = pygame.Color(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
             self.fruta = self.cobra
 
         window_width, window_height = game_window.get_size()
