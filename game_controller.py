@@ -66,16 +66,16 @@ class Controller:
         current_size = self.dimensao * self.dimensao
         current_score = self.path[x][y]
         if x < self.dimensao - 1:
-            scores[0] = self.path[x + 1][y]/current_score
+            scores[0] = int(self.path[x + 1][y] > current_score)
             snake_rel_size[0] = int((current_size - self.path[x + 1][y]) > len(self.cascavel.snake_body))
         if x > 0:
-            scores[1] = self.path[x - 1][y]/current_score
+            scores[1] = int(self.path[x - 1][y] > current_score)
             snake_rel_size[1] = int((current_size - self.path[x - 1][y]) > len(self.cascavel.snake_body))
         if y > 0:
-            scores[2] = self.path[x][y - 1]/current_score
+            scores[2] = int(self.path[x][y - 1] > current_score)
             snake_rel_size[2] = int((current_size - self.path[x][y - 1]) > len(self.cascavel.snake_body))
         if y < self.dimensao - 1:
-            scores[3] = self.path[x][y + 1]/current_score
+            scores[3] = int(self.path[x][y + 1] > current_score)
             snake_rel_size[3] = int((current_size - self.path[x][y + 1]) > len(self.cascavel.snake_body))
         return np.concatenate([scores, snake_rel_size])
 

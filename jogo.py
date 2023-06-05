@@ -9,7 +9,7 @@ class Cascavel:
     def __init__(self, tabuleiro, obstaculos, aleatorio = False):
         self.aleatorio = aleatorio
         self.obstaculos = obstaculos
-        self.posicoes_frutas = [(17, 28), (20, 19), (26, 29), (5, 22), (8, 10), (8, 30), (12, 18), (14, 13), (17, 28), (20, 19), (26, 29), (5, 22), (8, 10), (8, 30), (12, 18), (14, 13), (17, 28), (20, 19), (26, 29), (5, 22), (8, 10), (8, 30), (12, 18), (14, 13), (17, 28), (20, 19), (26, 29), (5, 22), (8, 10), (8, 30), (12, 18), (14, 13)]
+        self.posicoes_frutas = [(18, 2), (4, 10), (14, 4), (1, 3), (2, 19), (15, 14), (1, 6), (13, 4), (8, 18), (5, 18), (10, 7), (14, 9), (6, 11), (18, 1), (1, 13), (9, 4), (13, 18), (9, 6), (12, 8), (1, 1), (9, 10), (3, 11), (10, 6), (17, 1), (2, 12), (13, 2), (18, 2), (13, 14), (15, 9), (4, 10), (15, 15), (3, 11), (2, 14), (13, 10), (6, 11), (13, 1), (11, 6), (10, 15), (7, 16), (19, 18)]
         
         self.tabuleiro = tabuleiro
         
@@ -35,7 +35,7 @@ class Cascavel:
             self.fruit_position = [random.randrange(1, (self.tabuleiro[0])), random.randrange(1, (self.tabuleiro[1]))]
         else:
             # Caso contrario, fixar em 300 e 100
-            self.snake_position = [30, 30]
+            self.snake_position = [5, 5]
             self.snake_body = [[self.snake_position[0], self.snake_position[1]],
                 [self.snake_position[0] + 1, self.snake_position[1]],
                 [self.snake_position[0] + 2, self.snake_position[1]],
@@ -43,7 +43,7 @@ class Cascavel:
                 [self.snake_position[0] + 4, self.snake_position[1]]
             ]
                     # fruit position
-            self.fruit_position = [30, 10]
+            self.fruit_position = [3, 10]
         self.fruit_spawn = True
         self.gameOver = False
         # definições de pontuação
