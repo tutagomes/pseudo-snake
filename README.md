@@ -2,13 +2,13 @@
 
 ```sh
 
-pip install pygame scipy 
+pip install pygame gym numpy matplotlib stable-baselines3
 
 # para treinar visualizando
-python snake.py
+python train.py
 
 # para treinar com vários cores em background
-python headless.py
+python play.py
 
 ```
 

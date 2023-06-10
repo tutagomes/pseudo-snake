@@ -28,7 +28,7 @@ def draw_all(cobra = None):
     pygame.display.update()
 
 env = MyGameEnv(20)  # No need to wrap the environment
-model = DQN.load("dqn_mlp")
+model = DQN.load("./gym/best_model.zip")
 obs = env.reset()
 for i in range(1000):
     pygame.event.get()
