@@ -9,7 +9,7 @@ class Cascavel:
     def __init__(self, tabuleiro, obstaculos, aleatorio = False):
         self.aleatorio = aleatorio
         self.obstaculos = obstaculos
-        self.posicoes_frutas = [(18, 2), (4, 10), (14, 4), (1, 3), (2, 19), (15, 14), (1, 6), (13, 4), (8, 18), (5, 18), (10, 7), (14, 9), (6, 11), (18, 1), (1, 13), (9, 4), (13, 18), (9, 6), (12, 8), (1, 1), (9, 10), (3, 11), (10, 6), (17, 1), (2, 12), (13, 2), (18, 2), (13, 14), (15, 9), (4, 10), (15, 15), (3, 11), (2, 14), (13, 10), (6, 11), (13, 1), (11, 6), (10, 15), (7, 16), (19, 18)]
+        self.posicoes_frutas = [(9, 8), (6, 4), (4, 5), (5, 8), (7, 1), (4, 4), (1, 1), (4, 5), (4, 5), (5, 9), (7, 3), (2, 3), (7, 7), (1, 5), (3, 1), (5, 5), (7, 7), (5, 4), (4, 9), (1, 9), (5, 6), (5, 4), (1, 7), (9, 4), (5, 6), (7, 1), (8, 2), (6, 5), (9, 5), (7, 3), (9, 7), (2, 9), (2, 7), (6, 9), (4, 9), (4, 5), (7, 1), (7, 9), (4, 8), (3, 7)]
         
         self.tabuleiro = tabuleiro
         
@@ -43,7 +43,7 @@ class Cascavel:
                 [self.snake_position[0] + 4, self.snake_position[1]]
             ]
                     # fruit position
-            self.fruit_position = [3, 10]
+            self.fruit_position = [3, 3]
         self.fruit_spawn = True
         self.gameOver = False
         # definições de pontuação
@@ -60,7 +60,7 @@ class Cascavel:
             return 'LEFT'
 
     def is_valid_position(self, position, scale = 0):
-        if (scale <= position[0] <= (self.tabuleiro[0])) and (scale <= position[1] <= (self.tabuleiro[1]) - scale ) and (position not in self.snake_body) and (position not in self.obstaculos):
+        if (scale <= position[0] < (self.tabuleiro[0])) and (scale <= position[1] < self.tabuleiro[1]) and (position not in self.snake_body) and (position not in self.obstaculos):
             return True
         return False
 
@@ -133,14 +133,31 @@ class Cascavel:
         else:
             self.snake_body.pop()
 
-    def move(self, direction):
+    def get_next_position_full_direction(self, direction):
+        position = [self.snake_position[0], self.snake_position[1]]
+        if direction == "UP":
+            position[1] = position[1] - 1
+        if direction == "DOWN":
+            position[1] = position[1] + 1
+        if direction == "LEFT":
+            position[0] = position[0] - 1
+        if direction == "RIGHT":
+            position[0] = position[0] + 1
+        return position
+    
+    def move(self, direction, full_direction = False):
         if self.gameOver:
-            return
+            return [self.score, self.is_game_over()]
 
         # Moving the snake
-        position = self.get_next_position(direction)
-        self.snake_position[0] = position[0]
-        self.snake_position[1] = position[1]
+        if not full_direction:
+            position = self.get_next_position(direction)
+            self.snake_position[0] = position[0]
+            self.snake_position[1] = position[1]
+        else:
+            position = self.get_next_position_full_direction(direction)
+            self.snake_position[0] = position[0]
+            self.snake_position[1] = position[1]
 
         # vamos calcular o quanto a cobra ganhou
         self.__have_scored()
@@ -161,12 +178,12 @@ class Cascavel:
         # Game Over conditions
         # Se bateu na borda do tabuleiro
 
-        if self.is_valid_position(self.snake_position, 0):
-            self.game_over()
+        # if not self.is_valid_position(self.snake_position, 0):
+        #     self.game_over()
 
-        if self.snake_position[0] < 0 or self.snake_position[0] > self.tabuleiro[0]:
+        if self.snake_position[0] < 0 or self.snake_position[0] >= self.tabuleiro[0]:
             self.game_over()
-        if self.snake_position[1] < 0 or self.snake_position[1] > self.tabuleiro[1] :
+        if self.snake_position[1] < 0 or self.snake_position[1] >= self.tabuleiro[1] :
             self.game_over()
 
         # Se bateu no proprio corpo
