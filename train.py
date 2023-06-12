@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from stable_baselines3.common import results_plotter
+import torch as th
 
 class SaveOnBestTrainingRewardCallback(BaseCallback):
     """
@@ -19,7 +20,7 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
     :param verbose: (int)
     """
 
-    def __init__(self, check_freq: int, log_dir: str, verbose=1):
+    def __init__(self, check_freq: int, log_dir: str, verbose=0):
         super().__init__(verbose)
         self.check_freq = check_freq
         self.log_dir = log_dir
@@ -59,12 +60,18 @@ os.makedirs(log_dir, exist_ok=True)
 callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
 env = MyGameEnv(20)  # No need to wrap the environment
 env = Monitor(env, log_dir, info_keywords=('pontos',))
+policy_kwargs = dict(activation_fn=th.nn.ReLU, net_arch=[1024, 512])
 
-model = DQN('MlpPolicy', env, verbose=1, gamma=0.99,
-    exploration_fraction=0.2,
-    exploration_final_eps=0.07,
-    batch_size=200)
-model.learn(total_timesteps=500000, callback=callback)
+model = DQN('MlpPolicy', env, verbose=1, gamma=0.99, policy_kwargs=policy_kwargs, batch_size=200)
+# model = DQN('MlpPolicy', env, verbose=1, gamma=0.99, batch_size=200)
+
+# model = DQN('MlpPolicy', env, verbose=1, gamma=0.99,
+#     exploration_fraction=0.9,
+#     exploration_final_eps=0.2,
+#     policy_kwargs=policy_kwargs,
+#     batch_size=200)
+print(model.policy)
+model.learn(total_timesteps=1000000, callback=callback)
 model.save("dqn_mlp")
 
 def moving_average(values, window):

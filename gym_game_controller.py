@@ -31,7 +31,7 @@ class MyGameEnv(gym.Env):
         info = {
             "pontos": pontos
         }
-        if done or self.frame_iteration > 100*len(self.cascavel.snake_body):
+        if done or self.frame_iteration > 400*len(self.cascavel.snake_body):
             self.cascavel.game_over()
             obs = self.get_current_observation()
             done = True
@@ -41,11 +41,11 @@ class MyGameEnv(gym.Env):
             self.frame_iteration = 0
             self.last_score = pontos
             reward = 10
-        current_size = self.dimensao * self.dimensao
-        if self.path[dx, dy] > self.path[ax, ay] and int(abs(current_size - self.path[dx][dy]) > len(self.cascavel.snake_body)):
-            reward += 0.1
-        else:
-            reward -= 0.1
+        # current_size = self.dimensao * self.dimensao
+        # if self.path[dx, dy] > self.path[ax, ay] and int(abs(current_size - self.path[dx][dy]) > len(self.cascavel.snake_body)):
+        #     reward += 0.005
+        # else:
+        #     reward -= 0.005
         obs = self.get_current_observation()
         return obs, reward, done, info
     
