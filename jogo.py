@@ -60,7 +60,7 @@ class Cascavel:
             return 'LEFT'
 
     def is_valid_position(self, position, scale = 0):
-        if (scale <= position[0] < (self.tabuleiro[0])) and (scale <= position[1] < self.tabuleiro[1]) and (position not in self.snake_body) and (position not in self.obstaculos):
+        if (scale <= position[0] < (self.tabuleiro[0])) and (scale <= position[1] < self.tabuleiro[1]) and (position not in self.snake_body[:-1]) and (position not in self.obstaculos):
             return True
         return False
 

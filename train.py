@@ -1,5 +1,5 @@
 from gym_game_controller import MyGameEnv
-from stable_baselines3 import DQN
+from stable_baselines3 import DQN, PPO
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.results_plotter import load_results, ts2xy
@@ -58,11 +58,11 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
 log_dir = "./gym/"
 os.makedirs(log_dir, exist_ok=True)
 callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
-env = MyGameEnv(20)  # No need to wrap the environment
+env = MyGameEnv(30, [], True)  # No need to wrap the environment
 env = Monitor(env, log_dir, info_keywords=('pontos',))
 policy_kwargs = dict(activation_fn=th.nn.ReLU, net_arch=[1024, 512])
 
-model = DQN('MlpPolicy', env, verbose=1, gamma=0.99, policy_kwargs=policy_kwargs, batch_size=200)
+model = PPO('MlpPolicy', env, verbose=1, policy_kwargs=policy_kwargs)
 # model = DQN('MlpPolicy', env, verbose=1, gamma=0.99, batch_size=200)
 
 # model = DQN('MlpPolicy', env, verbose=1, gamma=0.99,
@@ -71,8 +71,8 @@ model = DQN('MlpPolicy', env, verbose=1, gamma=0.99, policy_kwargs=policy_kwargs
 #     policy_kwargs=policy_kwargs,
 #     batch_size=200)
 print(model.policy)
-model.learn(total_timesteps=1000000, callback=callback)
-model.save("dqn_mlp")
+model.learn(total_timesteps= 1000000, callback=callback)
+model.save("ppo_mlp")
 
 def moving_average(values, window):
     """

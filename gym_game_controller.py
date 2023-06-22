@@ -10,42 +10,48 @@ class MyGameEnv(gym.Env):
 
         # Define action and observation space
         # They must be gym.spaces objects
-        self.action_space = spaces.Discrete(4)  # Example for a binary action space: 0 and 1
+        self.action_space = spaces.Discrete(3)  # Example for a binary action space: 0 and 1
         self.observation_space = spaces.MultiBinary(20,)
         self.dimensao = dimensao
         self.cascavel = Cascavel([dimensao, dimensao], obstaculos, aleatorio)
-        caminho = create_path(dimensao, 0.001)
+        self.caminho = create_path(dimensao, 1)
         self.path = np.zeros((dimensao, dimensao))
-        self.directions = ['UP', 'DOWN', 'RIGHT', 'LEFT']
-        for i, pos in enumerate(caminho):
-            self.path[pos[0]][pos[1]] = i + 1
+        self.directions = ['UP', 'RIGHT', 'LEFT', 'DOWN']
+        for i, pos in enumerate(self.caminho):
+            self.path[int(pos[0])][int(pos[1])] = i + 1
         self.frame_iteration = 0
         self.last_score = 0
     
     def step(self, action):
         self.frame_iteration += 1
         ax, ay = self.cascavel.snake_position
-        pontos, done = self.cascavel.move(self.directions[action], True)
+        pontos, done = self.cascavel.move(self.directions[action])
         dx, dy = self.cascavel.snake_position
         reward = 0
         info = {
-            "pontos": pontos
+            "pontos": pontos,
+            "hx": self.cascavel.snake_position[0],
+            "hy": self.cascavel.snake_position[1],
+            "body": self.cascavel.snake_body,
+            "done": done
         }
-        if done or self.frame_iteration > 400*len(self.cascavel.snake_body):
+        if done:
             self.cascavel.game_over()
             obs = self.get_current_observation()
-            done = True
+            reward = -100
+            return obs, reward, done, info
+        if self.frame_iteration > 500*len(self.cascavel.snake_body):
+            self.cascavel.game_over()
+            obs = self.get_current_observation()
             reward = -10
             return obs, reward, done, info
         if self.last_score is not pontos:
             self.frame_iteration = 0
             self.last_score = pontos
             reward = 10
-        # current_size = self.dimensao * self.dimensao
-        # if self.path[dx, dy] > self.path[ax, ay] and int(abs(current_size - self.path[dx][dy]) > len(self.cascavel.snake_body)):
-        #     reward += 0.005
-        # else:
-        #     reward -= 0.005
+        map_size = self.dimensao * self.dimensao
+        if int(abs(map_size - self.path[dx][dy]) > len(self.cascavel.snake_body)):
+            reward += 0.1
         obs = self.get_current_observation()
         return obs, reward, done, info
     
@@ -98,19 +104,19 @@ class MyGameEnv(gym.Env):
         current_score = self.path[x][y]
         if x < self.dimensao - 1:
             scores[0] = int(self.path[x + 1][y] > current_score)
-            snake_rel_size[0] = int(abs(current_size - self.path[x + 1][y]) > len(self.cascavel.snake_body))
+            snake_rel_size[0] = int(abs(current_size - self.path[x + 1][y]) > (len(self.cascavel.snake_body) + 1))
         if x > 0:
             scores[1] = int(self.path[x - 1][y] > current_score)
-            snake_rel_size[1] = int(abs(current_size - self.path[x - 1][y]) > len(self.cascavel.snake_body))
+            snake_rel_size[1] = int(abs(current_size - self.path[x - 1][y]) > (len(self.cascavel.snake_body) + 1))
         if y > 0:
             scores[2] = int(self.path[x][y - 1] > current_score)
-            snake_rel_size[2] = int(abs(current_size - self.path[x][y - 1]) > len(self.cascavel.snake_body))
+            snake_rel_size[2] = int(abs(current_size - self.path[x][y - 1]) > (len(self.cascavel.snake_body) + 1))
         if y < self.dimensao - 1:
             scores[3] = int(self.path[x][y + 1] > current_score)
-            snake_rel_size[3] = int(abs(current_size - self.path[x][y + 1]) > len(self.cascavel.snake_body))
+            snake_rel_size[3] = int(abs(current_size - self.path[x][y + 1]) > (len(self.cascavel.snake_body) + 1))
     
         return np.concatenate([scores, snake_rel_size])
-    
+
     def __get_possible_moves(self):
         possible_moves = []
         scale = 0
@@ -159,4 +165,24 @@ class MyGameEnv(gym.Env):
         return np.concatenate([moves, direction, food, cycle])
     
     def draw(self, pygame, game_window, show_cycle = False):
+        window_width, window_height = game_window.get_size()
+        ppp = min(window_width / self.dimensao, window_height / self.dimensao)
+        font = pygame.font.SysFont('arial', 12)
+        x, y = self.cascavel.snake_position
+        current_score = self.path[x][y]
         self.cascavel.draw(pygame, game_window)
+        for i in range(len(self.path)):
+            current_size = self.dimensao * self.dimensao
+            for j in range(len(self.path[i])):
+                color = (255, 255, 255)
+                if i < self.dimensao - 1 and (self.path[i + 1][j] > current_score) and ((current_size - self.path[i + 1][j]) > (len(self.cascavel.snake_body))):
+                    color = (0, 255, 255)
+                if i > 0 and (self.path[i - 1][j] > current_score) and ((current_size - self.path[i - 1][j]) > (len(self.cascavel.snake_body))):
+                    color = (255, 255, 0)
+                if j > 0 and (self.path[i][j - 1] > current_score) and ((current_size - self.path[i][j - 1]) > (len(self.cascavel.snake_body))):
+                    color = (0, 255, 0)
+                if j < self.dimensao - 1 and (self.path[i][j + 1] > current_score) and ((current_size - self.path[i][j + 1]) > (len(self.cascavel.snake_body))):
+                    color = (255, 0, 255)
+                text = font.render(str(int(self.path[i][j])), True, color)
+                position = [i * ppp, j * ppp]
+                game_window.blit(text, position)

@@ -1,6 +1,8 @@
 import random
 import math
 import random
+import os
+import numpy as np
 
 def backbite(n, path):
     itemp = math.floor(random.random() * 2)
@@ -83,9 +85,15 @@ def generate_hamiltonian_circuit(n, q):
         success = backbite(n, path)
     return path
 
-def create_path(n = 10, q = 1.0):
+def create_path(n = 10, q = 1.0, dir = './cycles'):
+    os.makedirs(dir, exist_ok=True)
+    file_path = dir + '/' + str(n) + '_' + str(q)
+    if os.path.exists(file_path):
+        path = np.loadtxt(file_path)
+        return path
     path = generate_hamiltonian_circuit(n, q)
+    np.savetxt(file_path, path)
     return path
 
 if __name__ == '__main__':
-    print(create_path())
+    print(create_path(40))
