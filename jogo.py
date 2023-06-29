@@ -35,7 +35,7 @@ class Cascavel:
             self.fruit_position = [random.randrange(1, (self.tabuleiro[0])), random.randrange(1, (self.tabuleiro[1]))]
         else:
             # Caso contrario, fixar em 300 e 100
-            self.snake_position = [5, 5]
+            self.snake_position = [15, 10]
             self.snake_body = [[self.snake_position[0], self.snake_position[1]],
                 [self.snake_position[0] + 1, self.snake_position[1]],
                 [self.snake_position[0] + 2, self.snake_position[1]],
@@ -43,7 +43,7 @@ class Cascavel:
                 [self.snake_position[0] + 4, self.snake_position[1]]
             ]
                     # fruit position
-            self.fruit_position = [3, 3]
+            self.fruit_position = [5, 10]
         self.fruit_spawn = True
         self.gameOver = False
         # definições de pontuação
