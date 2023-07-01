@@ -62,18 +62,18 @@ env = MyGameEnv(20, [], False)  # No need to wrap the environment
 env = Monitor(env, log_dir, info_keywords=('pontos',))
 policy_kwargs = dict(activation_fn=th.nn.ReLU, net_arch=[1024, 512])
 
-# model = PPO('MlpPolicy', env, verbose=1, policy_kwargs=policy_kwargs)
+model = PPO('MlpPolicy', env, verbose=1, policy_kwargs=policy_kwargs)
 # model = DQN('MlpPolicy', env, verbose=1, gamma=0.99, batch_size=200)
 
-model = DQN('MlpPolicy', env, verbose=1, gamma=0.99,
-    exploration_fraction=0.9,
-    exploration_final_eps=0.2,
-    policy_kwargs=policy_kwargs,
-    batch_size=200)
+# model = DQN('MlpPolicy', env, verbose=1, gamma=0.99,
+    # exploration_fraction=0.9,
+    # exploration_final_eps=0.2,
+    # policy_kwargs=policy_kwargs,
+    # batch_size=200)
 print(model.policy)
-model.learn(total_timesteps=500000, callback=callback)
-model.save("dqn_mlp")
-# model.save("ppo_mlp")
+model.learn(total_timesteps=5000000, callback=callback)
+# model.save("dqn_mlp")
+model.save("ppo_mlp")
 
 def moving_average(values, window):
     """

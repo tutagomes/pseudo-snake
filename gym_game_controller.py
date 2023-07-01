@@ -12,7 +12,7 @@ class MyGameEnv(gym.Env):
         # Define action and observation space
         # They must be gym.spaces objects
         self.action_space = spaces.Discrete(3)  # Example for a binary action space: 0 and 1
-        self.observation_space = spaces.MultiBinary(20,)
+        self.observation_space = spaces.MultiBinary(24,)
         self.dimensao = dimensao
         self.cascavel = Cascavel([dimensao, dimensao], obstaculos, aleatorio)
         self.caminho = create_path(dimensao, 1)
@@ -68,16 +68,17 @@ class MyGameEnv(gym.Env):
             self.frame_iteration = 0
             self.last_score = pontos
             reward = 100
-        else:
-            reward -= 1
+
+        if abs(fx - dx) < abs(fx - ax) or abs(fy - dy) < abs(fy - ay):
+            reward += 1
         # elif self.path[ax][ay] < self.path[fx][fy] < self.path[dx][dy]:
         #     reward -= 50000
-        if not self.__can_i_move_on_cycle([ax, ay], [dx, dy]):
-            reward -= 1
-        elif ([dx, dy] in list(self.visited)):
-            reward -=10
-        else:
-            reward +=1
+        # if not self.__can_i_move_on_cycle([ax, ay], [dx, dy]):
+        #     reward -= 1
+        # elif ([dx, dy] in list(self.visited)):
+        #     reward -=10
+        # else:
+        #     reward +=1
         obs = self.get_current_observation()
         self.visited.append([dx, dy])
         return obs, reward, done, info
@@ -243,11 +244,11 @@ class MyGameEnv(gym.Env):
     def get_current_observation(self):
         # This method should return the current observation/state of your game.
         # This is just a placeholder and should be replaced with your game's logic.
-        # direction = self.__get_direction_on_array()
+        direction = self.__get_direction_on_array()
         moves = self.__get_possible_moves()
         food = self.__get_rel_food_position()
         cycle = self.__get_rel_cycle_position()
-        return np.concatenate([moves, food, cycle])
+        return np.concatenate([moves, direction, food, cycle])
     
     def draw(self, pygame, game_window, show_cycle = False):
         window_width, window_height = game_window.get_size()
