@@ -21,8 +21,8 @@ class Cascavel:
     def reset(self):
         self.frutas = 0
         # defining snake default position
-        x_max = self.tabuleiro[0]
-        y_max = self.tabuleiro[1]
+        x_max = self.tabuleiro[0] - 6
+        y_max = self.tabuleiro[1] - 6
         # Se for aleatório, deve gerar uma posição da fruta e da cobra aleatoriamente no mapa
         if self.aleatorio:
             self.snake_position = [random.randint(1, x_max), random.randint(1, y_max)]
@@ -32,7 +32,7 @@ class Cascavel:
                 [self.snake_position[0] + 3, self.snake_position[1]],
                 [self.snake_position[0] + 4, self.snake_position[1]]
             ]
-            self.fruit_position = [random.randrange(1, (self.tabuleiro[0])), random.randrange(1, (self.tabuleiro[1]))]
+            self.fruit_position = [random.randrange(1, (self.tabuleiro[0] - 5)), random.randrange(1, (self.tabuleiro[1] - 5))]
         else:
             # Caso contrario, fixar em 300 e 100
             self.snake_position = [15, 10]

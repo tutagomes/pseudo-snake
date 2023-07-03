@@ -51,12 +51,12 @@ class MyGameEnv(gym.Env):
         if done:
             self.cascavel.game_over()
             obs = self.get_current_observation()
-            reward = -100
+            reward = -1000
             return obs, reward, done, info
-        if self.frame_iteration > 1.5*self.dimensao*self.dimensao:
+        if self.frame_iteration > 2*self.dimensao*self.dimensao:
             self.cascavel.game_over()
             obs = self.get_current_observation()
-            reward = -100
+            reward = -1000
             return obs, reward, done, info
         
         self.__calculate_lower_points()
@@ -67,18 +67,18 @@ class MyGameEnv(gym.Env):
         if self.last_score is not pontos:
             self.frame_iteration = 0
             self.last_score = pontos
-            reward = 100
+            reward = 1000
 
         if abs(fx - dx) < abs(fx - ax) or abs(fy - dy) < abs(fy - ay):
             reward += 1
         # elif self.path[ax][ay] < self.path[fx][fy] < self.path[dx][dy]:
         #     reward -= 50000
-        # if not self.__can_i_move_on_cycle([ax, ay], [dx, dy]):
-        #     reward -= 1
-        # elif ([dx, dy] in list(self.visited)):
-        #     reward -=10
-        # else:
-        #     reward +=1
+        if not self.__can_i_move_on_cycle([ax, ay], [dx, dy]):
+            reward -= self.dimensao*2
+        elif ([dx, dy] in list(self.visited)):
+            reward -= self.dimensao
+        else:
+            reward +=1
         obs = self.get_current_observation()
         self.visited.append([dx, dy])
         return obs, reward, done, info
